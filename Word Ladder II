@@ -1,0 +1,96 @@
+class Solution {
+
+void dfs(vector<string>& v, vector<vector<string>>& vv,
+         int len, int currlen,
+         string &beginWord,
+         unordered_map<string,vector<string>>& adj)
+{
+    if(currlen==len && v.back()==beginWord){
+        vector<string> temp=v;
+        reverse(temp.begin(), temp.end());
+        vv.push_back(temp);
+        return;
+    }
+
+    if(adj.count(v.back())){
+        for(auto it:adj[v.back()]){
+            v.push_back(it);
+            dfs(v,vv,len,currlen+1,beginWord,adj);
+            v.pop_back();
+        }
+    }
+}
+
+public:
+
+vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList) {
+
+    unordered_set<string> w1(wordList.begin(), wordList.end());
+
+    if(w1.find(endWord)==w1.end()){
+        return {};
+    }
+
+    int len=0;
+
+    unordered_map<string,vector<string>> adj;
+
+    queue<pair<string,int>> qq;
+    qq.push({beginWord,1});
+
+    vector<string> used;
+
+    while(!qq.empty()){
+
+        int s=qq.size();
+
+        while(s--){
+
+            auto i=qq.front();
+            qq.pop();
+
+            if(i.first==endWord){
+                len=i.second; break;
+            }
+
+            string word=i.first;
+            int cnt=i.second;
+
+            for(int j=0;j<word.size();j++){
+
+                char st=word[j];
+
+                for(char ll='a';ll<='z';ll++){
+
+                    word[j]=ll;
+
+                    if(w1.find(word)!=w1.end() ){
+                        if(find(used.begin(), used.end(), word)==used.end()){
+                        qq.push({word,cnt+1});
+                        used.push_back(word);}
+
+                        adj[word].push_back(i.first);
+                    }
+                }
+
+                word[j]=st;
+            }
+        }
+
+        for(auto it:used){
+            w1.erase(it);
+        }
+
+        used.clear();
+    }
+
+    vector<string> v;
+    v.push_back(endWord);
+
+    vector<vector<string>> vv;
+
+    dfs(v,vv,len,1,beginWord,adj);
+
+    return vv;
+}
+};
