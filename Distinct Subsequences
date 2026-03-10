@@ -1,0 +1,27 @@
+class Solution {
+public:
+    int numDistinct(string s, string t) {
+        int n = s.length();
+        int m = t.length();
+        
+        // Use unsigned long long to prevent overflow during intermediate DP steps
+        // The problem guarantees the final answer fits in a 32-bit signed int.
+        vector<unsigned long long> dp(m + 1, 0);
+        
+        // Base case: An empty string t can be formed by 1 subsequence of any prefix of s
+        dp[0] = 1;
+        
+        for (int i = 1; i <= n; i++) {
+            // Update backwards to use the values from the previous iteration of i
+            for (int j = m; j >= 1; j--) {
+                if (s[i - 1] == t[j - 1]) {
+                    // Current count = (ways without using s[i-1]) + (ways using s[i-1])
+                    dp[j] += dp[j - 1];
+                }
+                // Else: dp[j] stays the same (inherits from previous s prefix)
+            }
+        }
+        
+        return (int)dp[m];
+    }
+};
